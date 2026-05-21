@@ -231,14 +231,18 @@ function menuGerenciarConsultas ()
                 Consulta.listarConsultas();
                 const Consultaid = parseInt(prompt('Digite o ID da consulta que deseja atualizar: '));
                 const nomeConsultaAtualizado = prompt('Digite o novo nome da consulta (deixe em branco para manter o atual): ');
+                const idMedicoAtualizado = prompt('Digite o novo ID do médico para esta consulta (deixe em branco para manter o atual): ');
+                const idPacienteAtualizado = prompt('Digite o novo ID do paciente para esta consulta (deixe em branco para manter o atual): ');
                 const dataConsultaAtualizada = prompt('Digite a nova data da consulta (YYYY-MM-DD, deixe em branco para manter a atual): ');
                 const descricaoAtualizada = prompt('Digite uma nova descrição para a consulta (deixe em branco para manter a atual): ');
                 const consultaAtualizada = {
                     nome: nomeConsultaAtualizado,
                     data: dataConsultaAtualizada,
+                    idMedico: idMedicoAtualizado,
+                    idPaciente: idPacienteAtualizado,
                     descricao: descricaoAtualizada
                 };
-                if (nomeConsultaAtualizado === '' && dataConsultaAtualizada === '' && descricaoAtualizada === '') {
+                if (nomeConsultaAtualizado === '' && dataConsultaAtualizada === '' && idMedicoAtualizado === '' && idPacienteAtualizado === '' && descricaoAtualizada === '') {
                     console.log('Nenhum campo atualizado. Por favor, digite pelo menos um campo para atualizar.');
                     break;
                 }
