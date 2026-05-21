@@ -1,14 +1,14 @@
 const { consultarMedico } = require('./medico');
 const { consultarPaciente } = require('./paciente');
 
-let consulta = [];
+let consultas = [];
 let sequencialIdConsulta = 1;
 
 function adicionarConsulta (nomeConsulta, data, idMedico, idPaciente, descricao)
 {
     const medico = consultarMedico(idMedico);
     const paciente = consultarPaciente(idPaciente);
-
+    
     if (!medico) {
         return false;
     }
@@ -17,11 +17,24 @@ function adicionarConsulta (nomeConsulta, data, idMedico, idPaciente, descricao)
         return false;
     }
 
+    const dataConsulta = new Date(data);
+    if (isNaN(dataConsulta.getTime())) {
+        console.log('Data inválida. Por favor, digite uma data válida no formato YYYY-MM-DD.');
+        return false;
+    }
+
+    const consultasEncontradas = pesquisarConsultaPorData(data, idMedico, idPaciente);
+
+    if (consultasEncontradas.length > 0) {
+        console.log('Já existe uma consulta agendada para esta data, médico e paciente. Por favor, escolha outra data ou verifique os agendamentos existentes.');
+        return false;
+    }
+
     const id = sequencialIdConsulta;
-    consulta.push({
+    consultas.push({
         id,
         nome: nomeConsulta,
-        data: new Date(data),
+        data: dataConsulta.toISOString().split('T')[0],
         idMedico: medico.id,
         idPaciente: paciente.id,
         descricao: descricao
@@ -30,10 +43,27 @@ function adicionarConsulta (nomeConsulta, data, idMedico, idPaciente, descricao)
 
 }
 
+function pesquisarConsultaPorData (data, idMedico, idPaciente)
+{
+    const dataConsulta = new Date(data);
+    if (isNaN(dataConsulta.getTime())) {
+        console.log('Data inválida. Por favor, digite uma data válida no formato YYYY-MM-DD.');
+        return [];
+    }
+
+    const consultasEncontradas = consultas.filter(consulta => {
+        const dataMatch = consulta.data === dataConsulta.toISOString().split('T')[0];
+        const medicoMatch = idMedico ? consulta.idMedico === idMedico : true;
+        const pacienteMatch = idPaciente ? consulta.idPaciente === idPaciente : true;
+        return dataMatch && medicoMatch && pacienteMatch;
+    });
+    return consultasEncontradas;
+}
+
 function listarConsultas ()
 {
     console.log('\n\n-------------------LISTA DE ConsultaS-------------------\n\n')
-    consulta.forEach(consulta => {
+    consultas.forEach(consulta => {
         console.log(`ID: ${consulta.id}`);
         console.log(`Nome do Consulta: ${consulta.nome}`);
         console.log(`Data: ${consulta.data}`);
@@ -47,36 +77,37 @@ function listarConsultas ()
 function atualizarConsulta (id, novoConsulta)
 {
     listarConsultas();
-    const index = consulta.findIndex(consulta => consulta.id === id);
+    const index = consultas.findIndex(consulta => consulta.id === id);
     if (index === -1) {
         console.log('Consulta não encontrado. Por favor, digite um ID válido.');
         return false;
     }
 
-    consulta[index].nome = novoConsulta.nome || consulta[index].nome;
-    consulta[index].data = novoConsulta.data || consulta[index].data;
+    consultas[index].nome = novoConsulta.nome || consultas[index].nome;
+    consultas[index].data = novoConsulta.data || consultas[index].data;
 
      if (!medico) {
         return false;
     }
-    consulta[index].idMedico = novoConsulta.idMedico || consulta[index].idMedico;
+    consultas[index].idMedico = novoConsulta.idMedico || consultas[index].idMedico;
 
     if (!paciente) {
         return false;
     }
-    consulta[index].idPaciente = novoConsulta.idPaciente || consulta[index].idPaciente;
+    consultas[index].idPaciente = novoConsulta.idPaciente || consultas[index].idPaciente;
     
-    consulta[index].descricao = novoConsulta.descricao || consulta[index].descricao;
+    consultas[index].descricao = novoConsulta.descricao || consultas[index].descricao;
     return true;
            
 } 
 
 function excluirConsulta (id, confirmacao)
 {
-    const index = consulta.findIndex(consulta => consulta.id === id);
+    listarConsultas();
+    const index = consultas.findIndex(consulta => consulta.id === id);
     if (confirmacao.toLowerCase() === 'sim') {
          if (index !== -1) {
-            consulta.splice(index, 1);
+            consultas.splice(index, 1);
             console.log('Consulta excluído com sucesso!');
             return true;
         } else {
@@ -89,8 +120,8 @@ function excluirConsulta (id, confirmacao)
     }
 }
     
-
 module.exports = {
+    consultas,
     adicionarConsulta,
     listarConsultas,
     atualizarConsulta,

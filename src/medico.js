@@ -39,6 +39,7 @@ function atualizarMedico (id, novoMedico)
 
 function excluirMedico (id, confirmacao)
 {
+    listarMedicos();
     const index = medicos.findIndex(medico => medico.id === id);
     if (confirmacao.toLowerCase() === 'sim') {
          if (index !== -1) {
