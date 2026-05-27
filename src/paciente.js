@@ -1,6 +1,33 @@
 let pacientes = [];
 let sequencialIdPaciente = 1;
 
+const Pedro = {
+    id: 1,
+    nome: 'Pedro',
+    dataNascimento: '1995-10-15'
+}
+
+const Ana = {
+    id: 2,
+    nome: 'Ana',
+    dataNascimento: '2000-03-22'
+}
+
+const Lucas = {
+    id: 3,
+    nome: 'Lucas',
+    dataNascimento: '1988-07-09'
+}
+
+pacientes.push(Pedro);
+sequencialIdPaciente++;
+
+pacientes.push(Ana);
+sequencialIdPaciente++;
+
+pacientes.push(Lucas);
+sequencialIdPaciente++;
+
 function adicionarPaciente (nomePaciente, dataNascimento)
 {
     const id = sequencialIdPaciente;
@@ -10,6 +37,7 @@ function adicionarPaciente (nomePaciente, dataNascimento)
         dataNascimento: dataNascimento
     })
     sequencialIdPaciente++;
+    return true;
 }
 
 function listarPacientes ()

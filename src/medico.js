@@ -1,6 +1,33 @@
 let medicos = [];
 let sequencialIdMedico = 1;
 
+const João = {
+    id: 1,
+    nome: 'João',
+    especialidade: 'Cardiologia'
+}
+
+const Maria = {
+    id: 2,
+    nome: 'Maria',
+    especialidade: 'Dermatologia'
+}
+
+const Carlos = {
+    id: 3,
+    nome: 'Carlos',
+    especialidade: 'Ortopedia'
+}
+
+medicos.push(João);
+sequencialIdMedico++;
+
+medicos.push(Maria);
+sequencialIdMedico++;
+
+medicos.push(Carlos);
+sequencialIdMedico++;
+
 function adicionarMedico (nomeMedico, especialidade)
 {
     const id = sequencialIdMedico;
@@ -10,6 +37,7 @@ function adicionarMedico (nomeMedico, especialidade)
         especialidade: especialidade
     });
     sequencialIdMedico++;
+    return true;
 }
 
 function listarMedicos ()

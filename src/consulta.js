@@ -1,129 +1,246 @@
-const { consultarMedico } = require('./medico');
-const { consultarPaciente } = require('./paciente');
+const { consultarMedico, medicos } = require('./medico');
+const { consultarPaciente, pacientes } = require('./paciente');
 
 let consultas = [];
 let sequencialIdConsulta = 1;
 
-function adicionarConsulta (nomeConsulta, data, idMedico, idPaciente, descricao)
+// CONSULTAS DE TESTE
+
+const consulta1 = {
+    id: 1,
+    nome: 'Consulta Rotina',
+    data: '2026-06-01',
+    idMedico: 1,
+    idPaciente: 1,
+    descricao: 'Avaliação geral'
+};
+
+const consulta2 = {
+    id: 2,
+    nome: 'Consulta Pele',
+    data: '2026-06-02',
+    idMedico: 2,
+    idPaciente: 2,
+    descricao: 'Análise dermatológica'
+};
+
+const consulta3 = {
+    id: 3,
+    nome: 'Consulta Joelho',
+    data: '2026-06-03',
+    idMedico: 3,
+    idPaciente: 3,
+    descricao: 'Dor no joelho'
+};
+
+consultas.push(consulta1);
+sequencialIdConsulta++;
+
+consultas.push(consulta2);
+sequencialIdConsulta++;
+
+consultas.push(consulta3);
+sequencialIdConsulta++;
+
+// ADICIONAR CONSULTA
+
+function adicionarConsulta(nomeConsulta, data, idMedico, idPaciente, descricao)
 {
     const medico = consultarMedico(idMedico);
     const paciente = consultarPaciente(idPaciente);
-    
+
     if (!medico) {
+        console.log('Médico não encontrado.');
         return false;
     }
-    
+
     if (!paciente) {
+        console.log('Paciente não encontrado.');
         return false;
     }
 
     const dataConsulta = new Date(data);
+
     if (isNaN(dataConsulta.getTime())) {
-        console.log('Data inválida. Por favor, digite uma data válida no formato YYYY-MM-DD.');
+        console.log('Data inválida. Use o formato YYYY-MM-DD.');
         return false;
     }
 
-    const consultasEncontradas = pesquisarConsultaPorData(data, idMedico, idPaciente);
+    const consultasEncontradas =
+        pesquisarPorData(data, idMedico, idPaciente);
 
     if (consultasEncontradas.length > 0) {
-        console.log('Já existe uma consulta agendada para esta data, médico e paciente. Por favor, escolha outra data ou verifique os agendamentos existentes.');
+        console.log('Já existe uma consulta para essa data, médico e paciente.');
         return false;
     }
 
     const id = sequencialIdConsulta;
+
     consultas.push({
         id,
         nome: nomeConsulta,
         data: dataConsulta.toISOString().split('T')[0],
         idMedico: medico.id,
         idPaciente: paciente.id,
-        descricao: descricao
-    })
+        descricao
+    });
+
     sequencialIdConsulta++;
 
+    return true;
 }
 
-function pesquisarConsultaPorData (data, idMedico, idPaciente)
-{
-    const dataConsulta = new Date(data);
-    if (isNaN(dataConsulta.getTime())) {
-        console.log('Data inválida. Por favor, digite uma data válida no formato YYYY-MM-DD.');
-        return [];
-    }
+// PESQUISAR CONSULTA POR DATA
 
-    const consultasEncontradas = consultas.filter(consulta => {
-        const dataMatch = consulta.data === dataConsulta.toISOString().split('T')[0];
-        const medicoMatch = idMedico ? consulta.idMedico === idMedico : true;
-        const pacienteMatch = idPaciente ? consulta.idPaciente === idPaciente : true;
+function pesquisarPorData(data, idMedico, idPaciente)
+{
+    return consultas.filter(consulta => {
+
+        const dataMatch =
+            data ? consulta.data === data : true;
+
+        const medicoMatch =
+            idMedico ? consulta.idMedico === idMedico : true;
+
+        const pacienteMatch =
+            idPaciente ? consulta.idPaciente === idPaciente : true;
+
         return dataMatch && medicoMatch && pacienteMatch;
     });
-    return consultasEncontradas;
 }
 
-function listarConsultas ()
+// PESQUISAR CONSULTA POR MÉDICO
+
+function pesquisarConsultaPorMedico(idMedico)
 {
-    console.log('\n\n-------------------LISTA DE ConsultaS-------------------\n\n')
+    return consultas.filter(
+        consulta => consulta.idMedico === idMedico
+    );
+}
+
+// PESQUISAR CONSULTA POR PACIENTE
+
+function pesquisarConsultaPorPaciente(idPaciente)
+{
+    return consultas.filter(
+        consulta => consulta.idPaciente === idPaciente
+    );
+}
+
+// LISTAR CONSULTAS
+
+function listarConsultas()
+{
+    console.log('\n\n-------------------LISTA DE CONSULTAS-------------------\n\n');
+
     consultas.forEach(consulta => {
         console.log(`ID: ${consulta.id}`);
-        console.log(`Nome do Consulta: ${consulta.nome}`);
+        console.log(`Nome da Consulta: ${consulta.nome}`);
         console.log(`Data: ${consulta.data}`);
         console.log(`ID do Médico: ${consulta.idMedico}`);
         console.log(`ID do Paciente: ${consulta.idPaciente}`);
         console.log(`Descrição: ${consulta.descricao}`);
         console.log('----------------');
-    })
+    });
 }
 
-function atualizarConsulta (id, novoConsulta)
+// ATUALIZAR CONSULTA
+
+function atualizarConsulta(id, novaConsulta)
 {
-    listarConsultas();
-    const index = consultas.findIndex(consulta => consulta.id === id);
+    const index =
+        consultas.findIndex(consulta => consulta.id === id);
+
     if (index === -1) {
-        console.log('Consulta não encontrado. Por favor, digite um ID válido.');
+        console.log('Consulta não encontrada.');
         return false;
     }
 
-    consultas[index].nome = novoConsulta.nome || consultas[index].nome;
-    consultas[index].data = novoConsulta.data || consultas[index].data;
+    consultas[index].nome =
+        novaConsulta.nome || consultas[index].nome;
 
-     if (!medico) {
-        return false;
-    }
-    consultas[index].idMedico = novoConsulta.idMedico || consultas[index].idMedico;
+    consultas[index].data =
+        novaConsulta.data || consultas[index].data;
 
-    if (!paciente) {
-        return false;
-    }
-    consultas[index].idPaciente = novoConsulta.idPaciente || consultas[index].idPaciente;
-    
-    consultas[index].descricao = novoConsulta.descricao || consultas[index].descricao;
-    return true;
-           
-} 
+    // Atualizar médico
+    if (novaConsulta.idMedico !== '') {
 
-function excluirConsulta (id, confirmacao)
-{
-    listarConsultas();
-    const index = consultas.findIndex(consulta => consulta.id === id);
-    if (confirmacao.toLowerCase() === 'sim') {
-         if (index !== -1) {
-            consultas.splice(index, 1);
-            console.log('Consulta excluído com sucesso!');
-            return true;
-        } else {
-            console.log('Consulta não encontrado. Por favor, digite um ID válido.');
+        const idMedico = parseInt(novaConsulta.idMedico);
+
+        if (!medicos.some(medico => medico.id === idMedico)) {
+            console.log('Médico não encontrado.');
             return false;
         }
-    } else {
-        console.log('Exclusão cancelada.');
+
+        consultas[index].idMedico = idMedico;
+    }
+
+    // Atualizar paciente
+    if (novaConsulta.idPaciente !== '') {
+
+        const idPaciente = parseInt(novaConsulta.idPaciente);
+
+        if (!pacientes.some(paciente => paciente.id === idPaciente)) {
+            console.log('Paciente não encontrado.');
+            return false;
+        }
+
+        consultas[index].idPaciente = idPaciente;
+    }
+
+    consultas[index].descricao =
+        novaConsulta.descricao || consultas[index].descricao;
+
+    return true;
+}
+
+// EXCLUIR CONSULTA
+
+function excluirConsulta(id, confirmacao)
+{
+    const index =
+        consultas.findIndex(consulta => consulta.id === id);
+
+    if (confirmacao.toLowerCase() === 'sim') {
+
+        if (index !== -1) {
+
+            consultas.splice(index, 1);
+
+            console.log('Consulta excluída com sucesso!');
+
+            return true;
+        }
+
+        console.log('Consulta não encontrada.');
+
         return false;
     }
+
+    console.log('Exclusão cancelada.');
+
+    return false;
 }
-    
+
+// CONSULTAR CONSULTA
+
+function consultarConsulta(id)
+{
+    return consultas.find(
+        consulta => consulta.id === id
+    );
+}
+
+// EXPORTS
+
 module.exports = {
     consultas,
     adicionarConsulta,
     listarConsultas,
     atualizarConsulta,
-    excluirConsulta
-}
+    excluirConsulta,
+    consultarConsulta,
+    pesquisarPorData,
+    pesquisarConsultaPorMedico,
+    pesquisarConsultaPorPaciente
+};
